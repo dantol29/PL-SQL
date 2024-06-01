@@ -8,6 +8,17 @@ BEGIN
 END;
 ```
 
+### Basic structure
+```
+DECLARE 
+   <declarations section> 
+BEGIN 
+   <executable command(s)>
+EXCEPTION 
+   <exception handling> 
+END;
+```
+
 ## Each block consists of three sub-parts
 
 ### 1. Declarations (DECLARE)
@@ -25,16 +36,6 @@ END;
 
 **Every PL/SQL statement ends with a semicolon (;)**
 
-### Basic structure
-```
-DECLARE 
-   <declarations section> 
-BEGIN 
-   <executable command(s)>
-EXCEPTION 
-   <exception handling> 
-END;
-```
 
 ## Data types
 ### NUMERIC
@@ -89,3 +90,44 @@ END;
 | `BLOB` |	Used to store large binary objects in the database. 8 to 128 terabytes TB |
 | `CLOB` |	Used to store large blocks of character data in the database.	8 to 128 TB |
 | `NCLOB` | Used to store large blocks of NCHAR data in the database. 8 to 128 TB |
+
+## Variables
+**Syntax**:
+`variable_name [CONSTANT] datatype [:= initial_value] `
+
+**Examples**:
+```
+sales number(10, 2); 
+pi CONSTANT double precision := 3.1415; 
+name varchar2(25); 
+address varchar2(100);
+```
+### SELECT INTO
+The SELECT INTO statement is used to fetch the results of a SQL query and assign them to PL/SQL variables.
+
+```
+DECLARE
+  v_employee_id  employees.employee_id%TYPE := 101;  -- Variable to hold employee ID
+  v_first_name   employees.first_name%TYPE;          -- Variable to hold first name
+  v_salary       employees.salary%TYPE;              -- Variable to hold salary
+BEGIN
+  -- Select first_name and salary into PL/SQL variables
+  SELECT first_name, salary
+  INTO v_first_name, v_salary
+  FROM employees
+  WHERE employee_id = v_employee_id;
+
+  -- Output the results
+  DBMS_OUTPUT.PUT_LINE('First Name: ' || v_first_name);
+  DBMS_OUTPUT.PUT_LINE('Salary: ' || v_salary);
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('No employee found with ID ' || v_employee_id);
+  WHEN TOO_MANY_ROWS THEN
+    DBMS_OUTPUT.PUT_LINE('More than one employee found with ID ' || v_employee_id);
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('An unexpected error occurred: ' || SQLERRM);
+END;
+```
+### %TYPE
+In PL/SQL, the `%TYPE` attribute is used to declare variables with the same data type as a column in a table or a previously declared variable
