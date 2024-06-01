@@ -36,11 +36,12 @@ END;
 
 **Every PL/SQL statement ends with a semicolon (;)**
 
+<hr>
 
 ## Data types
 
 <details>
-<summary> <h3>NUMERIC</h3> </summary>
+<summary> <h4>NUMERIC</h4> </summary>
    
 | Type | Value |
 | --- | --- |
@@ -62,7 +63,7 @@ END;
 </details>
 
 <details>
-<summary> <h3>CHARACTER</h3> </summary>
+<summary> <h4>CHARACTER</h4> </summary>
    
 | Type | Value |
 | --- | --- |
@@ -79,7 +80,7 @@ END;
 </details>
 
 <details>
-<summary> <h3>DATE</h3> </summary>
+<summary> <h4>DATE</h4> </summary>
 
 | Type | Value |
 | --- | --- |
@@ -97,7 +98,7 @@ END;
 </details>
 
 <details>
-<summary> <h3>LARGE OBJECT</h3> </summary>
+<summary> <h4>LARGE OBJECT</h4> </summary>
    
 | Type | Value |
 | --- | --- |
@@ -107,7 +108,10 @@ END;
 | `NCLOB` | Used to store large blocks of NCHAR data in the database. 8 to 128 TB |
 </details>
 
-## Variables
+<hr>
+<details>
+<summary> <h2>Variables</h2> </summary>
+   
 - `variable_name [CONSTANT] datatype [:= initial_value] `
 
 ```
@@ -120,8 +124,7 @@ address varchar2(100);
 - The SELECT INTO statement is used to fetch the results of a SQL query and assign them to PL/SQL variables.
 - In PL/SQL, the `%TYPE` attribute is used to declare variables with the same data type as a column in a table or a previously declared variable
 
-<details>
-<summary> <b>Example</b> </summary>
+ <b>Example:</b>
    
 ```
 DECLARE
@@ -134,28 +137,30 @@ BEGIN
   INTO v_first_name, v_salary
   FROM employees
   WHERE employee_id = v_employee_id;
-
-  -- Output the results
-  DBMS_OUTPUT.PUT_LINE('First Name: ' || v_first_name);
-  DBMS_OUTPUT.PUT_LINE('Salary: ' || v_salary);
-EXCEPTION
-  WHEN NO_DATA_FOUND THEN
-    DBMS_OUTPUT.PUT_LINE('No employee found with ID ' || v_employee_id);
-  WHEN TOO_MANY_ROWS THEN
-    DBMS_OUTPUT.PUT_LINE('More than one employee found with ID ' || v_employee_id);
-  WHEN OTHERS THEN
-    DBMS_OUTPUT.PUT_LINE('An unexpected error occurred: ' || SQLERRM);
 END;
 ```
 </details>
 
-## Arrays
+<details>
+<summary> <h2>Arrays</h2> </summary>
 
 ### VARRAY
 - `varray_type_name IS VARRAY(n) of <element_type>`
+- VARRAY can store a fixed-size sequential collection of elements of the same type
+- In Oracle environment, the starting index for varrays is always 1.
+- Varrays are one-dimensional arrays.
 
+```
+DECLARE 
+   type namesarray IS VARRAY(5) OF VARCHAR2(10); 
+   type grades IS VARRAY(5) OF INTEGER; 
+```
 
-## Loops
+</details>
+
+<details>
+<summary> <h2>Loops</h2> </summary>
+   
 - `EXIT` instead of `RETURN` 
 ```
 DECLARE 
@@ -169,6 +174,119 @@ BEGIN
    END loop outer_loop; 
 END; 
 ```
+
+</details>
+
+<details>
+<summary> <h2>Procedures</h2> </summary>
+   
+- Procedure is a program unit/module that performs a particular task. These subprograms are combined to form larger programs
+- A subprogram can be created − `At the schema level`, `Inside a package` and `Inside a PL/SQL block`
+     1. `At the schema level`, subprogram is a standalone subprogram. It is created with the `CREATE PROCEDURE` or the `CREATE FUNCTION` statement. It is stored in the database and can be deleted with the `DROP PROCEDURE` or `DROP FUNCTION` statement.
+     2. `Inside a package`, subprogram is a packaged subprogram. It is stored in the database and can be deleted only when the package is deleted with the `DROP PACKAGE` statement.
+     3.  `PL/SQL blocks` that can be invoked with a set of parameters
+
+_How to create a procedure?_
+```
+CREATE PROCEDURE greetings 
+AS 
+BEGIN 
+   dbms_output.put_line('Hello World!'); 
+END; 
+```
+
+_How to execute a procedure?_
+```
+EXECUTE greetings;
+```
+_OR_
+```
+BEGIN 
+   greetings; 
+END; 
+```
+
+#### Parameter modes in PL/SQL:
+
+| Type | Value |
+| --- | --- |
+| IN | lets you pass a value to the subprogram. It is a read-only parameter. Is passed by reference |
+| OUT | returns a value to the calling program. Inside the subprogram, an OUT parameter acts like a variable. You can change its value and reference the value after assigning it. The parameter must be variable and is passed by value |	
+| IN OUT | passes an initial value to a subprogram and returns an updated value to the caller. It can be assigned a value and the value can be read. Is passed by value |
+
+_An example with `IN` and `OUT`_
+```
+DECLARE 
+   a number; 
+   b number; 
+   c number;
+PROCEDURE findMin(x IN number, y IN number, z OUT number) IS 
+BEGIN 
+   IF x < y THEN 
+      z:= x; 
+   ELSE 
+      z:= y; 
+   END IF; 
+END;   
+BEGIN 
+   a:= 23; 
+   b:= 45; 
+   findMin(a, b, c); 
+   dbms_output.put_line(' Minimum of (23, 45) : ' || c); 
+END; 
+```
+
+_An example with `IN OUT`_
+```
+DECLARE 
+   a number; 
+PROCEDURE squareNum(x IN OUT number) IS 
+BEGIN 
+  x := x * x; 
+END;  
+BEGIN 
+   a:= 23; 
+   squareNum(a); 
+   dbms_output.put_line(' Square of (23): ' || a); 
+END; 
+```
+</details>
+
+<details>
+<summary> <h2>Functions</h2> </summary>
+   
+**A function is same as a procedure except that it returns a value**
+
+- The function must contain a return statement.
+- The `AS` keyword is used instead of the `IS` keyword for creating a standalone function.
+
+_An example with `RETURN` keyword`_
+```
+DECLARE 
+   a number; 
+   b number; 
+   c number; 
+FUNCTION findMax(x IN number, y IN number)  
+RETURN number 
+IS 
+    z number; 
+BEGIN 
+   IF x > y THEN 
+      z:= x; 
+   ELSE 
+      Z:= y; 
+   END IF;  
+   RETURN z; 
+END; 
+BEGIN 
+   a:= 23; 
+   b:= 45;  
+   c := findMax(a, b); 
+   dbms_output.put_line(' Maximum of (23,45): ' || c); 
+END;
+```
+</details>
+
 <details>
 <summary> <h2>String functions and operators</h2> </summary>
 
